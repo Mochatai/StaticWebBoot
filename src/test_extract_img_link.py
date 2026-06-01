@@ -1,7 +1,7 @@
 import unittest
-from textnode import TextNode, TextType, text_node_to_html_node
+from textnode import TextNode, TextType
 from inlineTotextNode import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link
-
+from htmlnode import text_node_to_html_node
 
 
 class test_extractImgLink(unittest.TestCase):
