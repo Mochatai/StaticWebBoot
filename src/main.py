@@ -121,9 +121,9 @@ def generate_page(from_path, template_path, dest_path, base_path):
     page_title = extract_title(from_path__content)
     template_with_title = template_path_content.replace("{{ Title }}", str(page_title))
     template_with_title_content = template_with_title.replace("{{ Content }}", html_string)
-    template_with_title_content_href = template_with_title_content.replace(f'href="/"', f'href="{base_path}"')
-    template_with_title_content_href_src = template_with_title_content_href.replace(f'src="/"', f'src="{base_path}"')
-
+    template_with_title_content_href = template_with_title_content.replace(f'href="/', f'href="{base_path}')
+    template_with_title_content_href_src = template_with_title_content_href.replace(f'src="/', f'src="{base_path}')
+    
 
     dest_path_clean = dest_path[:-2]
     dest_path_clean_html = dest_path_clean + "html"
