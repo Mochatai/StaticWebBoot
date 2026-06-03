@@ -131,29 +131,60 @@ def text_to_children(block_type, block):
             return htmo_code_node
 
         case BlockType.QUOTE:
-            text_strip = block.strip()
-            text_clean_strip = re.sub(r">+ ", "", text_strip)
+            text_strip = block
+            text_clean_strip = re.sub(r"> *", " ", text_strip)
 
-            text_clean_strip_node = text_to_textNodes(text_clean_strip)
-
+            text_clean_strip_list = text_clean_strip.splitlines()
+            text_nodes_list = []
+            for text_clean_strip_list_content in text_clean_strip_list:
+                if text_clean_strip_list_content == "" or text_clean_strip_list_content == " ":
+                    text_nodes_list.append(text_to_textNodes(f"  "))
+                    
+                    continue
+                text_nodes_list.append(text_to_textNodes(text_clean_strip_list_content))
+                
+            
             list_textnodes_leafnode = []
-            for text_node in text_clean_strip_node:
-                list_textnodes_leafnode.append(text_node_to_html_node(text_node))
+            for text_node in text_nodes_list:
+                if len(text_node) > 1:
+                    text_node = text_node.text[1:]
+                    temp_list = []
+                    for x in text_node:
+                        temp_list.append((text_node_to_html_node(x).to_html()))
+
+                    list_textnodes_leafnode.append(Leafnode("","".join(temp_list)))
+                    continue
+                
+                temp = text_node_to_html_node(text_node[0])
+                temp.value = temp.value[1:]
+                list_textnodes_leafnode.append(Leafnode(None,temp.to_html()))
+
             pt = ParentNode(f'{BlockType.QUOTE.value}', list_textnodes_leafnode)
             
             return pt
 
 
         case BlockType.UNORDERED_LIST:
-            text_strip = block.strip()
-            text_clean_strip = re.sub(r"-+ ", "", text_strip)
-
-            text_clean_strip_node = text_to_textNodes(text_clean_strip)
+            text_strip = block
+            text_clean_strip = re.sub(r"- ", "", text_strip)
+            text_clean_strip_list = text_clean_strip.splitlines()
+            text_nodes_list = []
+            for text_clean_strip_list_content in text_clean_strip_list:
+                text_nodes_list.append(text_to_textNodes(text_clean_strip_list_content))
+                 
 
             list_textnodes_leafnode = []
-            for text_node in text_clean_strip_node:
-                temp = text_node_to_html_node(text_node)
+            for text_node in text_nodes_list:
+                if len(text_node) > 1:
+                    temp_list = []
+                    for x in text_node:
+                        temp_list.append((text_node_to_html_node(x).to_html()))
+
+                    list_textnodes_leafnode.append(Leafnode("li","".join(temp_list)))
+                    continue
+                temp = text_node_to_html_node(text_node[0])
                 list_textnodes_leafnode.append(Leafnode("li",temp.to_html()))
+
             pt = ParentNode(f'{BlockType.UNORDERED_LIST.value}', list_textnodes_leafnode)
             
             return pt
@@ -161,13 +192,22 @@ def text_to_children(block_type, block):
 
         case BlockType.ORDERED_LIST:
             text_strip = block.strip()
-            text_clean_strip = re.sub(r"[0-9]. +", "", text_strip)
-
-            text_clean_strip_node = text_to_textNodes(text_clean_strip)
-
+            text_clean_strip = re.sub(r"([0-9]. )", "", text_strip)
+            text_clean_strip_list = text_clean_strip.splitlines()
+            text_nodes_list = []
+            for text_clean_strip_list_content in text_clean_strip_list:
+                text_nodes_list.append(text_to_textNodes(text_clean_strip_list_content))
+            
             list_textnodes_leafnode = []
-            for text_node in text_clean_strip_node:
-                temp = text_node_to_html_node(text_node)
+            for text_node in text_nodes_list:
+                if len(text_node) > 1:
+                    temp_list = []
+                    for x in text_node:
+                        temp_list.append((text_node_to_html_node(x).to_html()))
+
+                    list_textnodes_leafnode.append(Leafnode("li","".join(temp_list)))
+                    continue
+                temp = text_node_to_html_node(text_node[0])
                 list_textnodes_leafnode.append(Leafnode("li",temp.to_html()))
             pt = ParentNode(f'{BlockType.ORDERED_LIST.value}', list_textnodes_leafnode)
             
@@ -177,10 +217,9 @@ def text_to_children(block_type, block):
 
 def main():
     md = """
-```
-This is text that _should_ remain
-the **same** even with inline stuff
-```
+> "I am in fact a Hobbit in all but size."
+>
+> -- J.R.R. Tolkien
 """
 
     node = markdown_to_html_node(md)
